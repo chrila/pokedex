@@ -1,0 +1,12 @@
+.pokemon-card-overlay {
+  transition: .5s ease;
+}
+
+.pokemon-card-overlay:hover {
+  background-color: gray;
+  color: white;
+}
+
+.pokemon-pic {
+  cursor: pointer;
+}
