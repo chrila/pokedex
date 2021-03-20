@@ -1,6 +1,6 @@
 /******************************************************************************
  * pokedex.js                                                                 *
- * Consumption of pokeapi (http://pokeapi.co) using Javascript and Fetch API  *
+ * Consumption of pokeapi (https://pokeapi.co) using Javascript Fetch.        *
  * (c)2021 Christian Lampl                                                    *
  *****************************************************************************/
 
@@ -13,6 +13,9 @@ let url_prev;
 let pokemonGrid = $('#pokemonGrid');
 let buttonPrev = $('#buttonPrevious');
 let buttonNext = $('#buttonNext');
+let loadingInformation = $('#loadingInformation');
+let numberLoadingAct = $('#numberLoadingAct');
+let numberLoadingTotal = $('#numberLoadingTotal');
 
 // store current page of pokemons
 let pokemon_list = [];
@@ -55,7 +58,7 @@ function addGridItem(_pokemon) {
 
 // add grid items for all pokemon
 function addGridItems() {
-  pokemon_list.sort(function(a, b) {
+  pokemon_list.sort(function (a, b) {
     if (a.id < b.id) {
       return -1;
     }
@@ -63,7 +66,7 @@ function addGridItems() {
       return 1;
     }
     return 0;
-  }).forEach(function(p) {
+  }).forEach(function (p) {
     addGridItem(p);
   })
 }
@@ -71,7 +74,12 @@ function addGridItems() {
 // check if all pokemon have been fetched and execute callback
 function checkAllFetched(_afterFetch) {
   if (pokemon_list.length == pokemon_per_page) {
+    // hide loading animation
+    loadingInformation.hide();
     _afterFetch();
+  } else {
+    // update loading information
+    numberLoadingAct.html(pokemon_list.length);
   }
 }
 
@@ -84,15 +92,18 @@ function fetchPokemon(_pokemon, _afterFetch) {
     .then(function (response) {
       pokemon_list.push(response);
     })
-    .then(function (response) {
+    .then(function () {
       checkAllFetched(_afterFetch);
     });
 }
 
 // show pokemon list in grid
 function fetchAllPokemon(_pokemons) {
-  // empty current page
+  // empty cache
   pokemon_list.length = 0;
+  // display loading animation
+  loadingInformation.show();
+
   _pokemons.forEach(function (poke) {
     fetchPokemon(poke, addGridItems);
   });
@@ -132,6 +143,7 @@ function fetchPokemonList(_url) {
 }
 
 $(document).ready(function () {
+  numberLoadingTotal.html(pokemon_per_page);
   fetchPokemonList(url_base);
 
   /** add event listeners **/
