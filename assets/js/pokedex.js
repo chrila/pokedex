@@ -152,7 +152,7 @@ function showPokemonModal(_id) {
   modalTitle.html(poke.name);
   modalBody.html(details);
 
-  let modal = new bootstrap.Modal(document.getElementById('pokemon-modal'));
+  let modal = new bootstrap.Modal(document.getElementById('pokemonModal'));
   modal.show();
 }
 
