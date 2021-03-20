@@ -16,6 +16,8 @@ let buttonNext = $('#buttonNext');
 let loadingInformation = $('#loadingInformation');
 let numberLoadingAct = $('#numberLoadingAct');
 let numberLoadingTotal = $('#numberLoadingTotal');
+let modalTitle = $('#modalTitle');
+let modalBody = $('#modalBody');
 
 // store current page of pokemons
 let pokemon_list = [];
@@ -32,23 +34,12 @@ function getTypes(_pokemon) {
 
 // add grid item for one pokemon
 function addGridItem(_pokemon) {
-  let abilities = getAbilities(_pokemon);
-  let types = getTypes(_pokemon);
-
   let item =
     `<div class="col">
         <div class="card pokemon-card-overlay">
-          <img src="${_pokemon.sprites['front_default']}" class="card-img-top pokemon-pic" alt="${_pokemon.name}">
+          <img src="${_pokemon.sprites['front_default']}" class="card-img-top pokemon-card-pic" alt="${_pokemon.name}" data-id="${_pokemon.id}">
           <div class="card-body">
             <h5 class="card-title"># ${_pokemon.id} ${_pokemon.name}</h5>
-            <p>
-              <strong>Types:</strong><br />
-              ${types}
-              </p>
-              <p>
-              <strong>Abilities:</strong><br />
-              ${abilities}
-            </p>
           </div>
         </div>
       </div>`;
@@ -142,6 +133,29 @@ function fetchPokemonList(_url) {
     });
 }
 
+// show modal with detailed info about pokemon
+function showPokemonModal(_id) {
+  let poke = pokemon_list[(_id-1) % pokemon_per_page];
+  let abilities = getAbilities(poke);
+  let types = getTypes(poke);
+  let details = `
+  <img src="${poke.sprites['front_default']}" class="pokemon-modal-pic center" alt="${poke.name}">
+  <p>
+    <strong>Types:</strong><br />
+    ${types}
+  </p>
+  <p>
+    <strong>Abilities:</strong><br />
+    ${abilities}
+  </p>`
+
+  modalTitle.html(poke.name);
+  modalBody.html(details);
+
+  let modal = new bootstrap.Modal(document.getElementById('pokemon-modal'));
+  modal.show();
+}
+
 $(document).ready(function () {
   numberLoadingTotal.html(pokemon_per_page);
   fetchPokemonList(url_base);
@@ -158,9 +172,8 @@ $(document).ready(function () {
 
   $(document).on('click', function (e) {
     // pokemon picture clicked
-    if ($(e.target).hasClass('pokemon-pic')) {
-      let modal = new bootstrap.Modal(document.getElementById('pokemon-modal'));
-      modal.show();
+    if ($(e.target).hasClass('pokemon-card-pic')) {
+      showPokemonModal($(e.target).data('id'));
     }
   });
 });
