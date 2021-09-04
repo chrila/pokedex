@@ -10,14 +10,14 @@ let url_next;
 let url_prev;
 
 // elements
-let pokemonGrid = $('#pokemonGrid');
-let buttonPrev = $('#buttonPrevious');
-let buttonNext = $('#buttonNext');
-let loadingInformation = $('#loadingInformation');
-let numberLoadingAct = $('#numberLoadingAct');
-let numberLoadingTotal = $('#numberLoadingTotal');
-let modalTitle = $('#modalTitle');
-let modalBody = $('#modalBody');
+let pokemonGrid = document.getElementById('pokemonGrid');
+let buttonPrev = document.getElementById('buttonPrevious');
+let buttonNext = document.getElementById('buttonNext');
+let loadingInformation = document.getElementById('loadingInformation');
+let numberLoadingAct = document.getElementById('numberLoadingAct');
+let numberLoadingTotal = document.getElementById('numberLoadingTotal');
+let modalTitle = document.getElementById('modalTitle');
+let modalBody = document.getElementById('modalBody');
 
 // store current page of pokemons
 let pokemon_list = [];
@@ -44,7 +44,7 @@ function addGridItem(_pokemon) {
         </div>
       </div>`;
 
-  pokemonGrid.append(item);
+  pokemonGrid.innerHTML += item;
 }
 
 // add grid items for all pokemon
@@ -66,11 +66,11 @@ function addGridItems() {
 function checkAllFetched(_afterFetch) {
   if (pokemon_list.length == pokemon_per_page) {
     // hide loading animation
-    loadingInformation.hide();
+    loadingInformation.style.display = 'none';
     _afterFetch();
   } else {
     // update loading information
-    numberLoadingAct.html(pokemon_list.length);
+    numberLoadingAct.innerText = pokemon_list.length;
   }
 }
 
@@ -93,7 +93,7 @@ function fetchAllPokemon(_pokemons) {
   // empty cache
   pokemon_list.length = 0;
   // display loading animation
-  loadingInformation.show();
+  loadingInformation.style.display = 'block';
 
   _pokemons.forEach(function (poke) {
     fetchPokemon(poke, addGridItems);
@@ -102,23 +102,14 @@ function fetchAllPokemon(_pokemons) {
 
 // enable/disable previous/next button
 function checkButtons() {
-  if (!url_next) {
-    buttonNext.addClass('disabled');
-  } else {
-    buttonNext.removeClass('disabled');
-  }
-
-  if (!url_prev) {
-    buttonPrev.addClass('disabled');
-  } else {
-    buttonPrev.removeClass('disabled');
-  }
+  buttonNext.classList.toggle('disabled', !url_next);
+  buttonPrev.classList.toggle('disabled', !url_prev);
 }
 
 // fetch pokemon list
 function fetchPokemonList(_url) {
   // clear list
-  pokemonGrid.html('');
+  pokemonGrid.innerHTML = '';
 
   fetch(_url)
     .then(function (response) {
@@ -149,31 +140,31 @@ function showPokemonModal(_id) {
     ${abilities}
   </p>`
 
-  modalTitle.html(poke.name);
-  modalBody.html(details);
+  modalTitle.innerText = poke.name;
+  modalBody.innerHTML = details;
 
   let modal = new bootstrap.Modal(document.getElementById('pokemonModal'));
   modal.show();
 }
 
-$(document).ready(function () {
-  numberLoadingTotal.html(pokemon_per_page);
+document.addEventListener('DOMContentLoaded', function() {
+  numberLoadingTotal.innerText = pokemon_per_page;
   fetchPokemonList(url_base);
 
   /** add event listeners **/
 
-  buttonNext.on('click', function () {
+  buttonNext.addEventListener('click', function () {
     fetchPokemonList(url_next);
   });
 
-  buttonPrev.on('click', function () {
+  buttonPrev.addEventListener('click', function () {
     fetchPokemonList(url_prev);
   });
 
-  $(document).on('click', function (e) {
+  document.addEventListener('click', function (e) {
     // pokemon picture clicked
-    if ($(e.target).hasClass('pokemon-card-pic')) {
-      showPokemonModal($(e.target).data('id'));
+    if (e.target.classList.contains('pokemon-card-pic')) {
+      showPokemonModal(e.target.getAttribute('data-id'));
     }
   });
 });
